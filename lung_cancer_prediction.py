@@ -69,6 +69,8 @@ def prediction_page():
 
         input_df = pd.DataFrame(input_data)
 
+        input_df.columns = input_df.columns.str.strip().str.replace(' ', '_') 
+
         # Define model columns
         model_columns = [
             'AGE',
@@ -168,6 +170,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
