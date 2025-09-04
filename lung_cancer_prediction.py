@@ -10,6 +10,12 @@ rf_model = load('rf_model.joblib')
 scaler = load('scaler.pkl') 
 # scaler = MinMaxScaler()
 
+# Mappings for numerical encoding to 'YES'/'NO'
+mapping = {
+    1: 'YES',
+    2: 'NO'
+}
+
 # ---------------- Dataset Preview Page ----------------
 def dataset_preview_page():
     st.title('📊 DATASET PREVIEW')
@@ -69,78 +75,36 @@ def prediction_page():
 
         input_df = pd.DataFrame(input_data)
 
-        input_df.columns = input_df.columns.str.strip().str.replace(' ', '_') 
+        # Convert numerical features to 'YES'/'NO'
+        input_df['SMOKING'] = input_df['SMOKING'].map({'YES': 1, 'NO': 2})
+        input_df['YELLOW_FINGERS'] = input_df['YELLOW_FINGERS'].map({'YES': 1, 'NO': 2})
+        input_df['ANXIETY'] = input_df['ANXIETY'].map({'YES': 1, 'NO': 2})
+        input_df['PEER_PRESSURE'] = input_df['PEER_PRESSURE'].map({'YES': 1, 'NO': 2})
+        input_df['CHRONIC_DISEASE'] = input_df['CHRONIC_DISEASE'].map({'YES': 1, 'NO': 2})
+        input_df['FATIGUE'] = input_df['FATIGUE'].map({'YES': 1, 'NO': 2})
+        input_df['ALLERGY'] = input_df['ALLERGY'].map({'YES': 1, 'NO': 2})
+        input_df['WHEEZING'] = input_df['WHEEZING'].map({'YES': 1, 'NO': 2})
+        input_df['ALCOHOL_CONSUMPTION'] = input_df['ALCOHOL_CONSUMPTION'].map({'YES': 1, 'NO': 2})
+        input_df['COUGHING'] = input_df['COUGHING'].map({'YES': 1, 'NO': 2})
+        input_df['SHORTNESS_OF_BREATH'] = input_df['SHORTNESS_OF_BREATH'].map({'YES': 1, 'NO': 2})
+        input_df['SWALLOWING_DIFFICULTY'] = input_df['SWALLOWING_DIFFICULTY'].map({'YES': 1, 'NO': 2})
+        input_df['CHEST_PAIN'] = input_df['CHEST_PAIN'].map({'YES': 1, 'NO': 2})
 
-        # Define model columns
-        model_columns = [
-            'AGE',
-            'GENDER_F', 'GENDER_M',
-            'SMOKING_YES', 'SMOKING_NO',
-            'YELLOW_FINGERS_YES', 'YELLOW_FINGERS_NO',
-            'ANXIETY_YES', 'ANXIETY_NO',
-            'PEER_PRESSURE_YES', 'PEER_PRESSURE_NO',
-            'CHRONIC_DISEASE_YES', 'CHRONIC_DISEASE_NO',
-            'FATIGUE_YES', 'FATIGUE_NO',
-            'ALLERGY_YES', 'ALLERGY_NO',
-            'WHEEZING_YES', 'WHEEZING_NO',
-            'ALCOHOL_CONSUMPTION_YES', 'ALCOHOL_CONSUMPTION_NO',
-            'COUGHING_YES', 'COUGHING_NO',
-            'SHORTNESS_OF_BREATH_YES', 'SHORTNESS_OF_BREATH_NO',
-            'SWALLOWING_DIFFICULTY_YES', 'SWALLOWING_DIFFICULTY_NO',
-            'CHEST_PAIN_YES', 'CHEST_PAIN_NO'
-        ]
+        # Encode categorical variables into model-friendly format
+        input_df['GENDER_F'] = (input_df['GENDER'] == 'F').astype(int)
+        input_df['GENDER_M'] = (input_df['GENDER'] == 'M').astype(int)
 
-        # Create encoded dataframe
-        encoded_input_df = pd.DataFrame(0, index=input_df.index, columns=model_columns)
-        encoded_input_df['AGE'] = input_df['AGE']
+        # Drop GENDER column
+        input_df = input_df.drop('GENDER', axis=1)
 
-        # Hardcode categorical mappings
-        categorical_data = {
-            'GENDER': {'M': 'GENDER_M', 'F': 'GENDER_F'},
-            'SMOKING': {'YES': 'SMOKING_YES', 'NO': 'SMOKING_NO'},
-            'YELLOW_FINGERS': {'YES': 'YELLOW_FINGERS_YES', 'NO': 'YELLOW_FINGERS_NO'},
-            'ANXIETY': {'YES': 'ANXIETY_YES', 'NO': 'ANXIETY_NO'},
-            'PEER_PRESSURE': {'YES': 'PEER_PRESSURE_YES', 'NO': 'PEER_PRESSURE_NO'},
-            'CHRONIC_DISEASE': {'YES': 'CHRONIC_DISEASE_YES', 'NO': 'CHRONIC_DISEASE_NO'},
-            'FATIGUE': {'YES': 'FATIGUE_YES', 'NO': 'FATIGUE_NO'},
-            'ALLERGY': {'YES': 'ALLERGY_YES', 'NO': 'ALLERGY_NO'},
-            'WHEEZING': {'YES': 'WHEEZING_YES', 'NO': 'WHEEZING_NO'},
-            'ALCOHOL_CONSUMPTION': {'YES': 'ALCOHOL_CONSUMPTION_YES', 'NO': 'ALCOHOL_CONSUMPTION_NO'},
-            'COUGHING': {'YES': 'COUGHING_YES', 'NO': 'COUGHING_NO'},
-            'SHORTNESS_OF_BREATH': {'YES': 'SHORTNESS_OF_BREATH_YES', 'NO': 'SHORTNESS_OF_BREATH_NO'},
-            'SWALLOWING_DIFFICULTY': {'YES': 'SWALLOWING_DIFFICULTY_YES', 'NO': 'SWALLOWING_DIFFICULTY_NO'},
-            'CHEST_PAIN': {'YES': 'CHEST_PAIN_YES', 'NO': 'CHEST_PAIN_NO'}
-        }
+        # Ensure that all features match the model input
+        input_df_scaled = scaler.transform(input_df)
 
-        # Encode categorical
-        for col in categorical_data:
-            for column in categorical_data[col].values():
-                encoded_input_df[column] = 0
-            value = input_df[col].iloc[0]
-            encoded_input_df[categorical_data[col][value]] = 1
+        # Predict using the trained model
+        prediction = rf_model.predict(input_df_scaled)[0]
 
-        # Ensure all columns are present in same order as model
-        encoded_input_df = encoded_input_df.reindex(columns=model_columns, fill_value=0)
-
-        if scaler:
-            try:
-                # Match scaler feature names if available
-                if hasattr(scaler, "feature_names_in_"):
-                    encoded_input_df = encoded_input_df.reindex(columns=scaler.feature_names_in_, fill_value=0)
-                    
-                st.write("✅ Encoded Input DataFrame:", encoded_input_df)  # Debugging step
-
-                # Scale input
-                input_df_scaled = scaler.transform(encoded_input_df)
-
-                # Predict
-                prediction = rf_model.predict(input_df_scaled)[0]
-                st.success(f'🌟 PREDICTION: {"HIGH RISK OF LUNG CANCER" if prediction == 1 else "LOW RISK OF LUNG CANCER"}')
-
-            except Exception as e:
-                st.error(f"⚠️ Error while scaling input: {e}")
-        else:
-            st.error("⚠️ Scaler not loaded. Please check scaler.pkl.")
+        # Display prediction result
+        st.success(f'🌟 PREDICTION: {"HIGH RISK OF LUNG CANCER" if prediction == 1 else "LOW RISK OF LUNG CANCER"}')
 
 # ---------------- About Page ----------------
 def about_page():
@@ -170,6 +134,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
