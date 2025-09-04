@@ -10,12 +10,6 @@ rf_model = load('rf_model.joblib')
 scaler = load('scaler.pkl') 
 # scaler = MinMaxScaler()
 
-# Mappings for numerical encoding to 'YES'/'NO'
-mapping = {
-    1: 'YES',
-    2: 'NO'
-}
-
 # ---------------- Dataset Preview Page ----------------
 def dataset_preview_page():
     st.title('📊 DATASET PREVIEW')
@@ -75,7 +69,7 @@ def prediction_page():
 
         input_df = pd.DataFrame(input_data)
 
-        # Create binary columns based on the input data
+       # Create binary columns based on the input data
         input_df['GENDER_F'] = (input_df['GENDER'] == 'F').astype(int)
         input_df['GENDER_M'] = (input_df['GENDER'] == 'M').astype(int)
         input_df['SMOKING_YES'] = (input_df['SMOKING'] == 'YES').astype(int)
@@ -111,21 +105,13 @@ def prediction_page():
 
         # Define model columns
         model_columns = [
-            'AGE',
-            'GENDER_F', 'GENDER_M',
-            'SMOKING_YES', 'SMOKING_NO',
-            'YELLOW_FINGERS_YES', 'YELLOW_FINGERS_NO',
-            'ANXIETY_YES', 'ANXIETY_NO',
-            'PEER_PRESSURE_YES', 'PEER_PRESSURE_NO',
-            'CHRONIC_DISEASE_YES', 'CHRONIC_DISEASE_NO',
-            'FATIGUE_YES', 'FATIGUE_NO',
-            'ALLERGY_YES', 'ALLERGY_NO',
-            'WHEEZING_YES', 'WHEEZING_NO',
-            'ALCOHOL_CONSUMPTION_YES', 'ALCOHOL_CONSUMPTION_NO',
-            'COUGHING_YES', 'COUGHING_NO',
-            'SHORTNESS_OF_BREATH_YES', 'SHORTNESS_OF_BREATH_NO',
-            'SWALLOWING_DIFFICULTY_YES', 'SWALLOWING_DIFFICULTY_NO',
-            'CHEST_PAIN_YES', 'CHEST_PAIN_NO'
+        'AGE', 'GENDER_F', 'GENDER_M', 'SMOKING_YES', 'SMOKING_NO', 
+        'YELLOW_FINGERS_YES', 'YELLOW_FINGERS_NO', 'ANXIETY_YES', 'ANXIETY_NO', 
+        'PEER_PRESSURE_YES', 'PEER_PRESSURE_NO', 'CHRONIC_DISEASE_YES', 'CHRONIC_DISEASE_NO', 
+        'FATIGUE_YES', 'FATIGUE_NO', 'ALLERGY_YES', 'ALLERGY_NO', 
+        'WHEEZING_YES', 'WHEEZING_NO', 'ALCOHOL_CONSUMPTION_YES', 'ALCOHOL_CONSUMPTION_NO', 
+        'COUGHING_YES', 'COUGHING_NO', 'SHORTNESS_OF_BREATH_YES', 'SHORTNESS_OF_BREATH_NO', 
+        'SWALLOWING_DIFFICULTY_YES', 'SWALLOWING_DIFFICULTY_NO', 'CHEST_PAIN_YES', 'CHEST_PAIN_NO'
         ]
 
         # Create encoded dataframe
@@ -183,6 +169,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
