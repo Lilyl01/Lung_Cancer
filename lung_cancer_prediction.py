@@ -121,7 +121,7 @@ def prediction_page():
         # Ensure all columns are present in same order as model
         input_df = input_df.reindex(columns=model_columns, fill_value=0)
 
-         if scaler:
+    if scaler:
             try:
                # Scale input data
                 input_df_scaled = scaler.transform(input_df)
@@ -164,5 +164,6 @@ def main():
 if __name__ == '__main__':
     main()
     
+
 
 
