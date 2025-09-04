@@ -121,17 +121,10 @@ def prediction_page():
         # Ensure all columns are present in same order as model
         input_df = input_df.reindex(columns=model_columns, fill_value=0)
 
-        if scaler:
+         if scaler:
             try:
-                # Match scaler feature names if available
-                if hasattr(scaler, "feature_names_in_"):
-                    encoded_input_df = encoded_input_df.reindex(columns=scaler.feature_names_in_, fill_value=0)
-                    
-                st.write("✅ Encoded Input DataFrame:", encoded_input_df)  # Debugging step
-
-                # Scale input
+                # Scale input data
                 input_df_scaled = scaler.transform(input_df)
-                prediction = rf_model.predict(input_df_scaled)[0]
 
                 # Predict
                 prediction = rf_model.predict(input_df_scaled)[0]
@@ -171,3 +164,4 @@ def main():
 if __name__ == '__main__':
     main()
     
+
