@@ -123,9 +123,9 @@ def prediction_page():
 
          if scaler:
             try:
-                # Scale input data
+               # Scale input data
                 input_df_scaled = scaler.transform(input_df)
-
+                
                 # Predict
                 prediction = rf_model.predict(input_df_scaled)[0]
                 st.success(f'🌟 PREDICTION: {"HIGH RISK OF LUNG CANCER" if prediction == 1 else "LOW RISK OF LUNG CANCER"}')
@@ -164,4 +164,5 @@ def main():
 if __name__ == '__main__':
     main()
     
+
 
