@@ -10,6 +10,12 @@ rf_model = load('rf_model.joblib')
 scaler = load('scaler.pkl') 
 # scaler = MinMaxScaler()
 
+# Mappings for numerical encoding to 'YES'/'NO'
+mapping = {
+    1: 'YES',
+    2: 'NO'
+}
+
 # ---------------- Dataset Preview Page ----------------
 def dataset_preview_page():
     st.title('📊 DATASET PREVIEW')
@@ -69,6 +75,40 @@ def prediction_page():
 
         input_df = pd.DataFrame(input_data)
 
+        # Create binary columns based on the input data
+        input_df['GENDER_F'] = (input_df['GENDER'] == 'F').astype(int)
+        input_df['GENDER_M'] = (input_df['GENDER'] == 'M').astype(int)
+        input_df['SMOKING_YES'] = (input_df['SMOKING'] == 'YES').astype(int)
+        input_df['SMOKING_NO'] = (input_df['SMOKING'] == 'NO').astype(int)
+        input_df['YELLOW_FINGERS_YES'] = (input_df['YELLOW_FINGERS'] == 'YES').astype(int)
+        input_df['YELLOW_FINGERS_NO'] = (input_df['YELLOW_FINGERS'] == 'NO').astype(int)
+        input_df['ANXIETY_YES'] = (input_df['ANXIETY'] == 'YES').astype(int)
+        input_df['ANXIETY_NO'] = (input_df['ANXIETY'] == 'NO').astype(int)
+        input_df['PEER_PRESSURE_YES'] = (input_df['PEER_PRESSURE'] == 'YES').astype(int)
+        input_df['PEER_PRESSURE_NO'] = (input_df['PEER_PRESSURE'] == 'NO').astype(int)
+        input_df['CHRONIC_DISEASE_YES'] = (input_df['CHRONIC_DISEASE'] == 'YES').astype(int)
+        input_df['CHRONIC_DISEASE_NO'] = (input_df['CHRONIC_DISEASE'] == 'NO').astype(int)
+        input_df['FATIGUE_YES'] = (input_df['FATIGUE'] == 'YES').astype(int)
+        input_df['FATIGUE_NO'] = (input_df['FATIGUE'] == 'NO').astype(int)
+        input_df['ALLERGY_YES'] = (input_df['ALLERGY'] == 'YES').astype(int)
+        input_df['ALLERGY_NO'] = (input_df['ALLERGY'] == 'NO').astype(int)
+        input_df['WHEEZING_YES'] = (input_df['WHEEZING'] == 'YES').astype(int)
+        input_df['WHEEZING_NO'] = (input_df['WHEEZING'] == 'NO').astype(int)
+        input_df['ALCOHOL_CONSUMPTION_YES'] = (input_df['ALCOHOL_CONSUMPTION'] == 'YES').astype(int)
+        input_df['ALCOHOL_CONSUMPTION_NO'] = (input_df['ALCOHOL_CONSUMPTION'] == 'NO').astype(int)
+        input_df['COUGHING_YES'] = (input_df['COUGHING'] == 'YES').astype(int)
+        input_df['COUGHING_NO'] = (input_df['COUGHING'] == 'NO').astype(int)
+        input_df['SHORTNESS_OF_BREATH_YES'] = (input_df['SHORTNESS_OF_BREATH'] == 'YES').astype(int)
+        input_df['SHORTNESS_OF_BREATH_NO'] = (input_df['SHORTNESS_OF_BREATH'] == 'NO').astype(int)
+        input_df['SWALLOWING_DIFFICULTY_YES'] = (input_df['SWALLOWING_DIFFICULTY'] == 'YES').astype(int)
+        input_df['SWALLOWING_DIFFICULTY_NO'] = (input_df['SWALLOWING_DIFFICULTY'] == 'NO').astype(int)
+        input_df['CHEST_PAIN_YES'] = (input_df['CHEST_PAIN'] == 'YES').astype(int)
+        input_df['CHEST_PAIN_NO'] = (input_df['CHEST_PAIN'] == 'NO').astype(int)
+
+        # Encode categorical variables into model-friendly format
+        #input_df['GENDER_F'] = (input_df['GENDER'] == 'F').astype(int)
+        #input_df['GENDER_M'] = (input_df['GENDER'] == 'M').astype(int)
+
         # Define model columns
         model_columns = [
             'AGE',
@@ -89,33 +129,8 @@ def prediction_page():
         ]
 
         # Create encoded dataframe
-        encoded_input_df = pd.DataFrame(0, index=input_df.index, columns=model_columns)
-        encoded_input_df['AGE'] = input_df['AGE']
-
-        # Hardcode categorical mappings
-        categorical_data = {
-            'GENDER': {'M': 'GENDER_M', 'F': 'GENDER_F'},
-            'SMOKING': {'YES': 'SMOKING_YES', 'NO': 'SMOKING_NO'},
-            'YELLOW_FINGERS': {'YES': 'YELLOW_FINGERS_YES', 'NO': 'YELLOW_FINGERS_NO'},
-            'ANXIETY': {'YES': 'ANXIETY_YES', 'NO': 'ANXIETY_NO'},
-            'PEER_PRESSURE': {'YES': 'PEER_PRESSURE_YES', 'NO': 'PEER_PRESSURE_NO'},
-            'CHRONIC_DISEASE': {'YES': 'CHRONIC_DISEASE_YES', 'NO': 'CHRONIC_DISEASE_NO'},
-            'FATIGUE': {'YES': 'FATIGUE_YES', 'NO': 'FATIGUE_NO'},
-            'ALLERGY': {'YES': 'ALLERGY_YES', 'NO': 'ALLERGY_NO'},
-            'WHEEZING': {'YES': 'WHEEZING_YES', 'NO': 'WHEEZING_NO'},
-            'ALCOHOL_CONSUMPTION': {'YES': 'ALCOHOL_CONSUMPTION_YES', 'NO': 'ALCOHOL_CONSUMPTION_NO'},
-            'COUGHING': {'YES': 'COUGHING_YES', 'NO': 'COUGHING_NO'},
-            'SHORTNESS_OF_BREATH': {'YES': 'SHORTNESS_OF_BREATH_YES', 'NO': 'SHORTNESS_OF_BREATH_NO'},
-            'SWALLOWING_DIFFICULTY': {'YES': 'SWALLOWING_DIFFICULTY_YES', 'NO': 'SWALLOWING_DIFFICULTY_NO'},
-            'CHEST_PAIN': {'YES': 'CHEST_PAIN_YES', 'NO': 'CHEST_PAIN_NO'}
-        }
-
-        # Encode categorical
-        for col in categorical_data:
-            for column in categorical_data[col].values():
-                encoded_input_df[column] = 0
-            value = input_df[col].iloc[0]
-            encoded_input_df[categorical_data[col][value]] = 1
+        #encoded_input_df = pd.DataFrame(0, index=input_df.index, columns=model_columns)
+        #encoded_input_df['AGE'] = input_df['AGE']
 
         # Ensure all columns are present in same order as model
         encoded_input_df = encoded_input_df.reindex(columns=model_columns, fill_value=0)
@@ -168,6 +183,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
