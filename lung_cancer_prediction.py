@@ -119,7 +119,7 @@ def prediction_page():
         #encoded_input_df['AGE'] = input_df['AGE']
 
         # Ensure all columns are present in same order as model
-        encoded_input_df = encoded_input_df.reindex(columns=model_columns, fill_value=0)
+        input_df = input_df.reindex(columns=model_columns, fill_value=0)
 
         if scaler:
             try:
@@ -130,7 +130,8 @@ def prediction_page():
                 st.write("✅ Encoded Input DataFrame:", encoded_input_df)  # Debugging step
 
                 # Scale input
-                input_df_scaled = scaler.transform(encoded_input_df)
+                input_df_scaled = scaler.transform(input_df)
+                prediction = rf_model.predict(input_df_scaled)[0]
 
                 # Predict
                 prediction = rf_model.predict(input_df_scaled)[0]
@@ -169,11 +170,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
+    
