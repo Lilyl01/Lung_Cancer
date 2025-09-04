@@ -69,9 +69,10 @@ def prediction_page():
 
         input_df = pd.DataFrame(input_data)
 
-       # Create binary columns based on the input data
         input_df['GENDER_F'] = (input_df['GENDER'] == 'F').astype(int)
         input_df['GENDER_M'] = (input_df['GENDER'] == 'M').astype(int)
+
+       # Instead of splitting ALCOHOL_CONSUMPTION into 'YES'/'NO' columns, keep it as a single feature
         input_df['SMOKING_YES'] = (input_df['SMOKING'] == 'YES').astype(int)
         input_df['SMOKING_NO'] = (input_df['SMOKING'] == 'NO').astype(int)
         input_df['YELLOW_FINGERS_YES'] = (input_df['YELLOW_FINGERS'] == 'YES').astype(int)
@@ -164,6 +165,7 @@ def main():
 if __name__ == '__main__':
     main()
     
+
 
 
 
